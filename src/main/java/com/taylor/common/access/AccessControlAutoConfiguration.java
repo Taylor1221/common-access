@@ -30,10 +30,15 @@ public class AccessControlAutoConfiguration {
         return new InMemoryAccessControlService();
     }
 
-    @Bean
+    @Configuration(proxyBeanMethods = false)
     @ConditionalOnClass({RedissonClient.class})
-    public AccessControlService redisAccessControlService() {
-        return new RedisAccessControlService();
+    public static class RedisAccessControlServiceConfiguration {
+
+        @Bean
+        public AccessControlService redisAccessControlService() {
+            return new RedisAccessControlService();
+        }
+
     }
 
 }
