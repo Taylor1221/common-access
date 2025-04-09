@@ -29,7 +29,7 @@ public class InMemoryAccessControlService implements AccessControlService {
 
     @Override
     public boolean isRateLimited(String key, int limit) {
-        if (rateLimitedCache.containsKey(key)) return false;
+        if (!rateLimitedCache.containsKey(key)) return false;
         return rateLimitedCache.get(key, false).data >= limit;
     }
 

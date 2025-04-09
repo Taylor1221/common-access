@@ -42,9 +42,9 @@ public class AccessControlAspect {
     public Object handleRateLimit(ProceedingJoinPoint joinPoint, RateLimit rateLimit) throws Throwable {
         // 获取限流的唯一键
         String key = buildRateLimitKey(joinPoint, rateLimit);
-        boolean allowed = accessControlService.isRateLimited(key, rateLimit.limit());
+        boolean isLimited = accessControlService.isRateLimited(key, rateLimit.limit());
         // 超过限制，返回限流响应
-        if (!allowed) {
+        if (isLimited) {
             return Result.fail(rateLimit.message());
         }
         Object result = joinPoint.proceed();
@@ -104,7 +104,8 @@ public class AccessControlAspect {
             prefix = method.getName();
         }
         String keyValue = getSpElExpressionVal(joinPoint, rateLimit.key());
-        return new KeyBuilder().add(AccessConstant.RATE_LIMIT_PREFIX).add(prefix).add(keyValue).build();
+        return new KeyBuilder().add(AccessConstant.PREFIX).add(AccessConstant.RATE_LIMIT_PREFIX)
+                .add(prefix).add(keyValue).build();
     }
 
     /**
@@ -122,7 +123,8 @@ public class AccessControlAspect {
             prefix = method.getName();
         }
         String keyValue = getSpElExpressionVal(joinPoint, banLimit.key());
-        return new KeyBuilder().add(AccessConstant.BANNED_PREFIX).add(prefix).add(keyValue).build();
+        return new KeyBuilder().add(AccessConstant.PREFIX).add(AccessConstant.BANNED_PREFIX)
+                .add(prefix).add(keyValue).build();
     }
 
 }

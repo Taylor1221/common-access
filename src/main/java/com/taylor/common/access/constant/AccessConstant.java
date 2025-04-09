@@ -10,8 +10,8 @@ public class AccessConstant {
 
     public static final String PREFIX = "access-control";
 
-    public static final String RATE_LIMIT_PREFIX = PREFIX + "rate-limit";
+    public static final String RATE_LIMIT_PREFIX = "rate-limit";
 
-    public static final String BANNED_PREFIX = PREFIX + "banned";
+    public static final String BANNED_PREFIX = "banned";
 
 }
