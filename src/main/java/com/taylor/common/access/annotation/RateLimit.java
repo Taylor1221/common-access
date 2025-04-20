@@ -1,15 +1,34 @@
 package com.taylor.common.access.annotation;
 
 import java.lang.annotation.*;
+import java.util.concurrent.TimeUnit;
 
+/**
+ * 接口限流注解
+ * <p>使用示例：
+ * <pre>{@code
+ * @RateLimit(
+ *     key = "'sms:' + #mobile",
+ *     limit = 1,
+ *     time = 1,
+ *     timeUnit = TimeUnit.MINUTES,
+ *     message = "手机号{key}操作过于频繁，请{time}{unit}后再试"
+ * )
+ * public void sendSms(String mobile) {...}
+ * }</pre>
+ */
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RateLimit {
 
     /**
-     * <p>访问控制的键，通常是方法的参数，作为访问控制的唯一标识。</p>
-     * <p>比如：手机号、用户名等。可以通过SpEL表达式动态传递。</p>
+     * 限流键（支持SpEL表达式）
+     * <p>示例：</p>
+     * <ul>
+     *   <li>'sms:' + #mobile  → 短信接口按手机号限流</li>
+     *   <li>T(java.util.UUID).randomUUID()  → 使用UUID</li>
+     * </ul>
      */
     String key();
 
@@ -21,21 +40,36 @@ public @interface RateLimit {
     String prefix() default "";
 
     /**
-     * <p>每个请求在设定的时间内允许最大调用次数（即限流次数）。</p>
-     * <p>例如：设置为5，表示该接口在设定时间内最多允许被调用5次。</p>
+     * 时间窗口内允许的最大请求次数
+     * <p>默认：1次（适合短信验证码场景）</p>
      */
     int limit() default 1;
 
     /**
-     * <p>请求的时间窗口，单位为秒，表示在该时间范围内进行限流计数。</p>
-     * <p>比如：设置为60，表示该接口最多可以在60秒内被调用 <code>maxCount</code> 次。</p>
+     * 时间窗口数值 默认1分钟
      */
-    int timeout() default 60;
+    long time() default 60;
 
     /**
-     * <p>提示信息，提供给前端用于展示限制原因。</p>
-     * <p>例如：登录失败次数过多，验证码请求频繁等。</p>
-     * <p>该消息将作为错误提示返回给前端，帮助用户理解被限制的原因。</p>
+     * 时间单位
+     * <p>支持从毫秒到天的多种时间单位</p>
+     */
+    TimeUnit timeUnit() default TimeUnit.MINUTES;
+
+    /**
+     * 限流触发时的提示信息（支持简单表达式）
+     * <p>支持占位符：</p>
+     * <ul>
+     *   <li>{key} → 替换为实际的限流键</li>
+     *   <li>{limit} → 替换为限制次数</li>
+     *   <li>{time} → 时间数值</li>
+     *   <li>{unit} → 时间单位</li>
+     * </ul>
+     * <p>示例：</p>
+     * <ul>
+     *   <li>"操作过于频繁，请{time}{unit}后再试" → "操作过于频繁，请1分钟后再试"</li>
+     *   <li>"资源{key}已达到访问上限" → "资源sms:13800138000已达到访问上限"</li>
+     * </ul>
      */
     String message() default "操作过于频繁，请稍后再试";
 

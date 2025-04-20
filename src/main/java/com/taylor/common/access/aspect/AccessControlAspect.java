@@ -38,19 +38,6 @@ public class AccessControlAspect {
 
     private final DefaultParameterNameDiscoverer nameDiscoverer = new DefaultParameterNameDiscoverer();
 
-    @Around("@annotation(rateLimit)")
-    public Object handleRateLimit(ProceedingJoinPoint joinPoint, RateLimit rateLimit) throws Throwable {
-        // 获取限流的唯一键
-        String key = buildRateLimitKey(joinPoint, rateLimit);
-        boolean isLimited = accessControlService.isRateLimited(key, rateLimit.limit());
-        // 超过限制，返回限流响应
-        if (isLimited) {
-            return Result.fail(rateLimit.message());
-        }
-        Object result = joinPoint.proceed();
-        accessControlService.recordVisit(key, rateLimit.timeout());
-        return result;
-    }
 
     @Around("@annotation(banLimit)")
     public Object handleBanLimit(ProceedingJoinPoint joinPoint, BanLimit banLimit) throws Throwable {
