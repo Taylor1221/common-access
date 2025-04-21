@@ -78,7 +78,8 @@ public class RateLimitAspect {
         Method method = signature.getMethod();
         Object[] args = joinPoint.getArgs();
 
-        String prefix = CharSequenceUtil.isEmpty(rateLimit.prefix()) ? method.getName() : rateLimit.prefix();
+        String prefix = CharSequenceUtil.isEmpty(rateLimit.prefix()) ?
+                method.getClass().getName() + "#" + method.getName() : rateLimit.prefix();
         // 创建SpEL上下文
         EvaluationContext context = new StandardEvaluationContext();
         String[] paramNames = parameterNameDiscoverer.getParameterNames(method);
@@ -90,7 +91,7 @@ public class RateLimitAspect {
 
         // 解析表达式
         Expression expression = parser.parseExpression(keyTemplate);
-        return prefix + expression.getValue(context, String.class);
+        return prefix + ":" + expression.getValue(context, String.class);
     }
 
     /**
