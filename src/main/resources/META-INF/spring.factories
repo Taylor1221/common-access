@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.taylor.common.access.AccessControlAutoConfiguration
+  com.taylor.common.access.AccessControlAutoConfiguration,\
+  com.taylor.common.access.RateLimitAutoConfiguration
