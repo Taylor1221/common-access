@@ -6,6 +6,8 @@ import org.redisson.api.RAtomicLong;
 import org.redisson.api.RMapCache;
 import org.redisson.api.RedissonClient;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -53,6 +55,11 @@ public class RedissonAttemptBlockService implements AttemptBlockService {
     public void reset(String key) {
         redissonClient.getAtomicLong(ATTEMPT_KEY_PREFIX + key).delete();
         redissonClient.getBucket(BLOCK_KEY_PREFIX + key).delete();
+    }
+
+    @Override
+    public List<BlockDTO> getAllBlockRecords() {
+        return Collections.emptyList();
     }
 
 }
